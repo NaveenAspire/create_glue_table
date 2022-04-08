@@ -36,7 +36,7 @@ class CreateTable:
                 )
                 table_definition_data["StorageDescriptor"]["Location"] = row["s3_path"]
                 self.create_table(table_definition_data)
-    
+
     def create_table(self, table_definition):
         """This method is used to create the tables from table definition"""
         try:
@@ -115,18 +115,19 @@ class CreateTable:
 
     def rename_table(self, table_definition):
         """This is method used to rename the table for existing table name"""
-        exist_table_response = self.glue_client.get_table(DatabaseName=table_definition['DatabaseName']
-                                                          ,Name=table_definition['Name'])
-        
+        exist_table_response = self.glue_client.get_table(
+            DatabaseName=table_definition["DatabaseName"], Name=table_definition["Name"]
+        )
+
         table_name = (
             table_definition["Name"] + "_" + datetime.now().strftime("%Y%m%d_%H%M%S")
         )
         exist_table_response["Name"] = table_name
         self.create_table(exist_table_response)
         self.glue_client.delete_table(
-                    DatabaseName=table_definition["DatabaseName"],
-                    TableName=table_definition["Name"],
-                )
+            DatabaseName=table_definition["DatabaseName"],
+            TableName=table_definition["Name"],
+        )
 
 
 def main():

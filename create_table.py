@@ -104,21 +104,29 @@ class CreateTable:
             if self.mode == "replace":
                 self.glue_client.delete_table(
                     DatabaseName=table_definition["DatabaseName"],
-                    TableName=table_definition["Nmae"],
+                    TableName=table_definition["Name"],
                 )
                 self.create_table(table_definition)
             elif self.mode == "rename":
                 self.rename_table(table_definition)
+                self.create_table(table_definition)
             else:
                 print('Invalid mode operation enter "rename" or "replace"')
 
     def rename_table(self, table_definition):
         """This is method used to rename the table for existing table name"""
+        exist_table_response = self.glue_client.get_table(DatabaseName=table_definition['DatabaseName']
+                                                          ,Name=table_definition['Name'])
+        
         table_name = (
             table_definition["Name"] + "_" + datetime.now().strftime("%Y%m%d_%H%M%S")
         )
-        table_definition["Name"] = table_name
-        self.create_table(table_definition)
+        exist_table_response["Name"] = table_name
+        self.create_table(exist_table_response)
+        self.glue_client.delete_table(
+                    DatabaseName=table_definition["DatabaseName"],
+                    TableName=table_definition["Name"],
+                )
 
 
 def main():

@@ -40,66 +40,27 @@ class CreateTable:
     def create_table(self, table_definition):
         """This method is used to create the tables from table definition"""
         try:
-            response = self.glue_client.create_table(
-                CatalogId=table_definition.get("CatalogId"),
-                DatabaseName=table_definition["DatabaseName"],
-                TableInput={
-                    "Name": table_definition["Name"],
-                    "Description": table_definition.get("Description"),
-                    "Owner": table_definition.get("Owner"),
-                    "LastAccessTime": table_definition.get("LastAccessTime"),
-                    "LastAnalyzedTime": table_definition.get("LastAnalyzedTime"),
-                    "Retention": table_definition.get("Retention"),
-                    "StorageDescriptor": {
-                        "Columns": table_definition["StorageDescriptor"].get("Columns"),
-                        "Location": table_definition["StorageDescriptor"].get(
-                            "Location"
-                        ),
-                        "AdditionalLocations": table_definition[
-                            "StorageDescriptor"
-                        ].get("AdditionalLocations"),
-                        "InputFormat": table_definition["StorageDescriptor"].get(
-                            "InputFormat"
-                        ),
-                        "OutputFormat": table_definition["StorageDescriptor"].get(
-                            "OutputFormat"
-                        ),
-                        "Compressed": table_definition["StorageDescriptor"].get(
-                            "Compresed"
-                        ),
-                        "NumberOfBuckets": table_definition["StorageDescriptor"].get(
-                            "NumberOfBuckets"
-                        ),
-                        "SerdeInfo": table_definition["StorageDescriptor"].get(
-                            "SerdeInfo"
-                        ),
-                        "BucketColumns": table_definition["StorageDescriptor"].get(
-                            "BucketColumns"
-                        ),
-                        "SortColumns": table_definition["StorageDescriptor"].get(
-                            "SortColumns"
-                        ),
-                        "Parameters": table_definition["StorageDescriptor"].get(
-                            "Parameters"
-                        ),
-                        "SkewedInfo": table_definition["StorageDescriptor"].get(
-                            "SkewedInfo"
-                        ),
-                        "StoredAsSubDirectories": table_definition[
-                            "StorageDescriptor"
-                        ].get("StoredAsSubDirectories"),
-                        "SchemaReference": table_definition["StorageDescriptor"].get(
-                            "SchemaReference"
-                        ),
-                    },
-                    "PartitionKeys": table_definition.get("PartitionKeys"),
-                    "ViewOriginalText": table_definition.get("ViewOriginalText"),
-                    "ViewExpandedText": table_definition.get("ViewExpandedText"),
-                    "TableType": table_definition.get("TableType"),
-                    "Parameters": table_definition.get("Parameters"),
-                    "TargetTable": table_definition.get("TargetTable"),
-                },
-            )
+            key_list = [
+                "Name",
+                "Description",
+                "Owner",
+                "LastAccessTime",
+                "LastAnalyzedTime",
+                "Retention",
+                "StorageDescriptor",
+                "PartitionKeys",
+                "ViewOriginalText",
+                "ViewExpandedText",
+                "TableType",
+                "Parameters",
+                "TargetTable",
+            ]
+            kwarg = {
+                key: table_definition[key]
+                for key in key_list
+                if key in table_definition.keys()
+            }
+            self.glue_client.create_table(**kwarg)
         except self.glue_client.exceptions.AlreadyExistsException:
             if self.mode == "replace":
                 self.glue_client.delete_table(
